@@ -1,15 +1,16 @@
 const router = require("express").Router();
 const productSchema = require("../model/productSchema");
-const {getAllProducts,getProductById,createNewUser,loginUser} = require("../control/ecomControl")
-
+const {getAllProducts,getProductById,createNewUser,loginUser,createNewProduct} = require("../control/ecomControl")
+const {isAdmin} = require("../control/ecomControl");
 //product routes:
-router.get('api/v1/products', getAllProducts);
-router.get('api/v1/products/:id', getProductById);
+router.get('/v1/products', getAllProducts);
+router.get('/v1/products/:id', getProductById);
 
 // Auth routes
-router.post('api/v1/auth/register', createNewUser);
-router.post('api/v1/auth/login', loginUser);
-
+router.post('/v1/auth/register', createNewUser);
+router.post('/v1/auth/login', loginUser);
+//
+router.post('/v1/product',isAdmin,createNewProduct)
 
 
 

@@ -10,9 +10,7 @@ const app =express();
 app.use(express.json());
 
 //routes:
-app.get('/',(req,res)=>{
-    console.log("Hello from /");
-})
+app.use("/api",routes);
 
 
 async function connectdb(){
@@ -23,3 +21,5 @@ async function connectdb(){
 
 }
 connectdb();
+
+

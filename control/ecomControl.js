@@ -11,7 +11,15 @@ const tokens= async (id)=>{
         console.log(e.message);
     }
 }
-
+//security check for admin:
+const isAdmin = (req, res, next) => {
+    // Check if user is logged in and has admin role
+    if (req.user && req.user.role === 'admin') {
+        next(); // User is authorized, continue to next middleware/route handler
+    } else {
+        res.status(403).json({ message: 'Unauthorized: Admin access required' });
+    }
+};
 //to create new user:
 const createNewUser = async (req,res)=>{
     const { username, email, password, role, createdAt } = req.body;
@@ -60,13 +68,23 @@ const loginUser = async (req,res)=>{
     })
 }
 //get product by id or name
-const getProductById = async (req,res)=>{
-    const { productName } = req.body;   //make it as product id
-    const items = await productSchema.findOne({productName});
-    res.status(200).json({
-        items
-    })
+const getProductById = async (req, res) => {
+    try {
+        const { id } =await req.params;
+        console.log(id);
+        const item = await productSchema.findOne({ _id: id });
+        
+        if (!item) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.status(200).json({ item });
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).json({ message: "Error retrieving product" });
+    }
 }
+
 //get all the items
 const getAllProducts = async (req, res) => {
     try {
@@ -88,6 +106,25 @@ const getAllProducts = async (req, res) => {
     }
 };
 
+const createNewProduct = async (req,res)=>{
+    try{
+        const {productName,description,price,category,imageUrl,quantity,createdAt} = req.body;
+        const newProduct =await new productSchema({productName,description,price,category,imageUrl,quantity,createdAt});
+        newProduct.save();
 
+        res.status(200).json({
+            status:"Success",
+            detatils:{
+                new_product:newProduct
+            }
+        })
+    }catch(e){
+        console.log(e.message);
+        res.status(400).json({
+            status:"error"
+        })
+    }
+    
+}
 
-module.exports = {getAllProducts,getProductById,loginUser,createNewUser}
+module.exports = {getAllProducts,getProductById,loginUser,createNewUser,createNewProduct,isAdmin}
